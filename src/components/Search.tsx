@@ -1,31 +1,57 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useRef } from "react";
 import styled from "styled-components";
 import { fetchSearch } from "../apis/api";
+import { GlobalContext } from "../App";
 import { IconSearch } from "../assets/icons/IconSearch";
 import { IconX } from "../assets/icons/IconX";
 import useDebounce from "../hooks/useDebounce";
+import { ISearch } from "../types/types";
 import { COLOR } from "../utils/constant";
+import { DeleteBtn } from "./DeleteBtn";
+import { PlaceHolder } from "./PlaceHolder";
 
-type Props = {
-  txt: string;
-  setTxt: React.Dispatch<React.SetStateAction<string>>;
-  isFocused: boolean;
-  setIsFocused: React.Dispatch<React.SetStateAction<boolean>>;
-};
+export const Search = () => {
+  const {
+    keyword,
+    recommendedKeywords,
+    selected,
+    isFocused,
 
-export const Search = ({ txt, setTxt, isFocused, setIsFocused }: Props) => {
+    setKeyword,
+    setRecommendedKeywords,
+    setSelected,
+    setIsFocused,
+  } = useContext(GlobalContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useDebounce({
-    value: txt,
-    action: () => txt !== "" && fetchSearch(txt),
+    value: keyword,
+    action: async () => {
+      if (keyword !== "") {
+        const res = await fetchSearch(keyword);
+        console.log(res.data);
+        const newRecommendedKeywords = res.data
+          .map((e: ISearch) => e.name)
+          .slice(0, 7);
+        setRecommendedKeywords(newRecommendedKeywords);
+      } else {
+        setRecommendedKeywords([]);
+      }
+    },
     delay: 1000,
   });
 
-  useEffect(() => {}, []);
-
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTxt(e.target.value);
+    const newKeyword = e.target.value;
+    setKeyword(newKeyword);
+    const cachedRecommendedKeywords = localStorage.getItem(newKeyword);
+    if (cachedRecommendedKeywords) {
+      setRecommendedKeywords(
+        JSON.parse(cachedRecommendedKeywords)
+          .data.map((e: ISearch) => e.name)
+          .slice(0, 7)
+      );
+    }
   };
 
   const onFocus = () => {
@@ -33,41 +59,79 @@ export const Search = ({ txt, setTxt, isFocused, setIsFocused }: Props) => {
   };
 
   const onBlur = () => {
-    // setIsFocused(false);
+    setIsFocused(false);
   };
 
   const onInputClick = () => {
     inputRef.current?.focus();
   };
 
-  const onXClick = () => {
-    setTxt("");
+  const onDeleteClick = () => {
+    console.log("onDeleteClick");
+    setKeyword("");
     inputRef.current?.focus();
+  };
+
+  const onSearchClick = (keyword: string) => {
+    const recentKeywords = localStorage.getItem("recentKeywords");
+    let newRecentKeywords;
+    if (recentKeywords) {
+      newRecentKeywords = [
+        keyword,
+        ...JSON.parse(localStorage.getItem("recentKeywords") || ""),
+      ];
+    } else {
+      newRecentKeywords = [keyword];
+    }
+
+    localStorage.setItem("recentKeywords", JSON.stringify(newRecentKeywords));
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log(selected);
+    const key = e.key;
+    if (key === "ArrowDown") {
+      console.log(selected, recommendedKeywords);
+      setSelected(selected + 1 > recommendedKeywords.length ? 1 : selected + 1);
+    } else if (key === "ArrowUp") {
+      setSelected(selected - 1 < 1 ? recommendedKeywords.length : selected - 1);
+    } else if (key === "Enter") {
+      // onSearchClick(recommendedKeywords);
+    }
+    console.log(e.key);
   };
 
   return (
     <S.Cont>
-      <S.Input
-        value={txt}
-        onChange={onChange}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        ref={inputRef}
-      />
-      {!isFocused && (
-        <S.PlaceHolder onClick={onInputClick}>
-          <S.IconSearchSmCont>
-            <IconSearch />
-          </S.IconSearchSmCont>
-          <div>질환명을 입력해 주세요</div>
-        </S.PlaceHolder>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <S.Input
+          value={keyword}
+          onChange={onChange}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          onKeyDown={onKeyDown}
+          ref={inputRef}
+        />
+        {/* <input type="reset" value="X" onClick={onDeleteClick} /> */}
+        {/* 
+        {isFocused && (
+          // <input type="reset" value="X" onClick={onDeleteClick} />
+          <DeleteBtn onClick={onDeleteClick} isFocused={isFocused} />
+          // <S.IconXCont onClick={onXClick}>
+          //   <IconX />
+          // </S.IconXCont>
+        )} */}
+      </form>
+      <DeleteBtn isFocused={isFocused} onClick={onDeleteClick} />
+
+      {keyword === "" && !isFocused && (
+        <PlaceHolder
+          placeHolder="질환명을 입력해 주세요"
+          onClick={onInputClick}
+        />
       )}
-      {isFocused && (
-        <S.IconXCont onClick={onXClick}>
-          <IconX />
-        </S.IconXCont>
-      )}
-      <S.IconSearchCont>
+
+      <S.IconSearchCont onClick={() => onSearchClick(keyword)}>
         <IconSearch />
       </S.IconSearchCont>
     </S.Cont>
@@ -90,31 +154,6 @@ const S = {
     height: 3em;
     font-size: 1.25rem;
     box-sizing: border-box;
-  `,
-  PlaceHolder: styled.div`
-    position: absolute;
-    left: 0;
-    color: ${COLOR.txt3};
-    display: flex;
-    margin: 1.75rem;
-    align-items: center;
-  `,
-  IconSearchSmCont: styled.div`
-    width: 1rem;
-    height: 1.125rem;
-    margin-right: 0.5rem;
-  `,
-  IconXCont: styled.div`
-    position: absolute;
-    height: 1.5rem;
-    width: 1.5rem;
-    right: 4.25rem;
-    border-radius: 2rem;
-    background-color: ${COLOR.txt3};
-    color: ${COLOR.white};
-    &:hover {
-      cursor: pointer;
-    }
   `,
   IconSearchCont: styled.div`
     position: absolute;

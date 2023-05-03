@@ -1,18 +1,30 @@
+import { useContext, useEffect } from "react";
 import styled from "styled-components";
+import { GlobalContext } from "../App";
 import { COLOR } from "../utils/constant";
 import { SearchEach } from "./SearchEach";
 
-type Props = {
-  list: string[];
-};
+export const SearchList = () => {
+  const { keyword, recommendedKeywords, selected, setRecommendedKeywords } =
+    useContext(GlobalContext);
 
-export const SearchList = ({ list }: Props) => {
+  useEffect(() => {
+    if (keyword === "") {
+      const recentKeywords = localStorage.getItem("recentKeywords");
+      recentKeywords && setRecommendedKeywords(JSON.parse(recentKeywords));
+    }
+  }, [keyword]);
+
   return (
     <S.Cont>
-      <S.Group>최근 검색어</S.Group>
-      {list.map((e) => (
-        <SearchEach value={e} />
-      ))}
+      <S.Group>{keyword === "" ? "최근 검색어" : "추천 검색어"}</S.Group>
+      {recommendedKeywords.map((e, i) =>
+        selected === i + 1 ? (
+          <SearchEach value={e} selected />
+        ) : (
+          <SearchEach value={e} />
+        )
+      )}
     </S.Cont>
   );
 };
@@ -31,5 +43,6 @@ const S = {
     color: ${COLOR.txt2};
     font-size: 0.825rem;
     padding: 0 2rem;
+    margin-bottom: 0.625rem;
   `,
 };
