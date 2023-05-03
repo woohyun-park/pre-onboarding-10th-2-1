@@ -1,14 +1,8 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import {
-  IllustPersonOne,
-  IllustPersonThree,
-  IllustPersonTwo,
-} from "./assets/illusts";
+import { Background } from "./components/Background";
 import { Search } from "./components/Search";
-import { SearchList } from "./components/SearchList";
 import { Title } from "./components/Title";
-import { useClickOutside } from "./hooks/useClickOutside";
 
 type IGlobalContext = {
   keyword: string;
@@ -17,11 +11,11 @@ type IGlobalContext = {
   isFocused: boolean;
   isSearching: boolean;
 
-  setKeyword: Function;
-  setRecommendedKeywords: Function;
-  setSelected: Function;
-  setIsFocused: Function;
-  setIsSearching: Function;
+  setKeyword: React.Dispatch<React.SetStateAction<string>>;
+  setRecommendedKeywords: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelected: React.Dispatch<React.SetStateAction<number>>;
+  setIsFocused: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsSearching: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export const GlobalContext = React.createContext<IGlobalContext>({
@@ -45,13 +39,6 @@ function App() {
   const [isFocused, setIsFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
-  const { ref } = useClickOutside({
-    onClickOutside: () => {
-      setIsFocused(false);
-      setSelected(0);
-    },
-  });
-
   return (
     <GlobalContext.Provider
       value={{
@@ -70,19 +57,8 @@ function App() {
       <S.ContWrap>
         <S.Cont>
           <Title value="국내 모든 임상시험 검색하고 온라인으로 참여하기" />
-          <div ref={ref}>
-            <Search />
-            {isFocused && <SearchList />}
-          </div>
-          <S.IllustContOne>
-            <IllustPersonOne />
-          </S.IllustContOne>
-          <S.IllustContTwo>
-            <IllustPersonTwo />
-          </S.IllustContTwo>
-          <S.IllustContThree>
-            <IllustPersonThree />
-          </S.IllustContThree>
+          <Search />
+          <Background />
         </S.Cont>
       </S.ContWrap>
     </GlobalContext.Provider>
@@ -108,24 +84,6 @@ const S = {
     width: 1040px;
     padding: 80px 0 160px;
     box-sizing: border-box;
-  `,
-  IllustContOne: styled.div`
-    position: absolute;
-    width: 148px;
-    left: 0;
-    top: 200px;
-  `,
-  IllustContTwo: styled.div`
-    position: absolute;
-    width: 130px;
-    right: 124px;
-    top: 280px;
-  `,
-  IllustContThree: styled.div`
-    position: absolute;
-    width: 116px;
-    right: 20px;
-    top: 188px;
   `,
 };
 
