@@ -7,7 +7,7 @@ type Props = {
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export const DeleteBtn = ({ onClick }: Props) => {
+export const SearchDeleteBtn = ({ onClick }: Props) => {
   return (
     <S.IconXCont onClick={onClick}>
       <IconX />

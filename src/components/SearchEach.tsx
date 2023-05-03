@@ -1,22 +1,20 @@
-import { useContext } from "react";
 import styled from "styled-components";
-import { updateRecentKeywords } from "../apis/local";
-import { GlobalContext } from "../App";
 import { IconSearch } from "../assets/icons/IconSearch";
 import { COLOR } from "../utils/constant";
 
 type Props = {
   value: string;
   onMouseEnter: () => void;
+  onClick: () => void;
   selected?: boolean;
 };
 
-export const SearchEach = ({ value, selected, onMouseEnter }: Props) => {
-  const { keyword, setKeyword } = useContext(GlobalContext);
-  const onClick = () => {
-    updateRecentKeywords(value);
-    setKeyword(value);
-  };
+export const SearchEach = ({
+  value,
+  selected,
+  onMouseEnter,
+  onClick,
+}: Props) => {
   return (
     <>
       {selected ? (

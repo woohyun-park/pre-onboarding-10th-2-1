@@ -7,19 +7,19 @@ type Props = {
   onClick: React.MouseEventHandler<HTMLDivElement>;
 };
 
-export const PlaceHolder = ({ placeHolder, onClick }: Props) => {
+export const SearchPlaceHolder = ({ placeHolder, onClick }: Props) => {
   return (
-    <S.PlaceHolder onClick={onClick}>
-      <S.IconSearchSmCont>
+    <S.Cont onClick={onClick}>
+      <S.IconCont>
         <IconSearch />
-      </S.IconSearchSmCont>
-      <div>{placeHolder}</div>
-    </S.PlaceHolder>
+      </S.IconCont>
+      <S.PlaceHolderCont>{placeHolder}</S.PlaceHolderCont>
+    </S.Cont>
   );
 };
 
 const S = {
-  PlaceHolder: styled.div`
+  Cont: styled.div`
     position: absolute;
     left: 0;
     color: ${COLOR.txt3};
@@ -27,9 +27,10 @@ const S = {
     margin: 1.75rem;
     align-items: center;
   `,
-  IconSearchSmCont: styled.div`
+  IconCont: styled.div`
     width: 1rem;
     height: 1.125rem;
     margin-right: 0.5rem;
   `,
+  PlaceHolderCont: styled.div``,
 };

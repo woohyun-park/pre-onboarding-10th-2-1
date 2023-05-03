@@ -1,6 +1,6 @@
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import styled from "styled-components";
-import { readRecentKeywords } from "../apis/local";
+import { updateRecentKeywords } from "../apis/api";
 import { GlobalContext } from "../App";
 import { COLOR } from "../utils/constant";
 import { SearchEach } from "./SearchEach";
@@ -11,16 +11,14 @@ export const SearchList = () => {
     recommendedKeywords,
     selected,
     isSearching,
-    setRecommendedKeywords,
+    setKeyword,
     setSelected,
   } = useContext(GlobalContext);
 
-  useEffect(() => {
-    if (keyword === "") {
-      const recentKeywords = readRecentKeywords();
-      recentKeywords && setRecommendedKeywords(recentKeywords);
-    }
-  }, [keyword]);
+  const onClick = (keyword: string) => {
+    updateRecentKeywords(keyword);
+    setKeyword(keyword);
+  };
 
   return (
     <S.Cont>
@@ -40,9 +38,14 @@ export const SearchList = () => {
                 value={e}
                 selected
                 onMouseEnter={() => setSelected(i + 1)}
+                onClick={() => onClick(e)}
               />
             ) : (
-              <SearchEach value={e} onMouseEnter={() => setSelected(i + 1)} />
+              <SearchEach
+                value={e}
+                onMouseEnter={() => setSelected(i + 1)}
+                onClick={() => onClick(e)}
+              />
             )
           )}
         </>
