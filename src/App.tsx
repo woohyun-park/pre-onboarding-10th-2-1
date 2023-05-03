@@ -8,6 +8,7 @@ import {
 import { Search } from "./components/Search";
 import { SearchList } from "./components/SearchList";
 import { Title } from "./components/Title";
+import { useClickOutside } from "./hooks/useClickOutside";
 
 type IGlobalContext = {
   keyword: string;
@@ -44,6 +45,13 @@ function App() {
   const [isFocused, setIsFocused] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
 
+  const { ref } = useClickOutside({
+    onClickOutside: () => {
+      setIsFocused(false);
+      setSelected(0);
+    },
+  });
+
   return (
     <GlobalContext.Provider
       value={{
@@ -62,8 +70,10 @@ function App() {
       <S.ContWrap>
         <S.Cont>
           <Title value="국내 모든 임상시험 검색하고 온라인으로 참여하기" />
-          <Search />
-          {isFocused && <SearchList />}
+          <div ref={ref}>
+            <Search />
+            {isFocused && <SearchList />}
+          </div>
           <S.IllustContOne>
             <IllustPersonOne />
           </S.IllustContOne>

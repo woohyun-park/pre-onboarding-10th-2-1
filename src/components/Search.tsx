@@ -56,11 +56,6 @@ export const Search = () => {
     setIsFocused(true);
   };
 
-  const onBlur = () => {
-    setIsFocused(false);
-    setSelected(0);
-  };
-
   const onInputClick = () => {
     inputRef.current?.focus();
   };
@@ -106,7 +101,7 @@ export const Search = () => {
         value={keyword}
         onChange={onChange}
         onFocus={onFocus}
-        onBlur={onBlur}
+        // onBlur={onBlur}
         onKeyDown={onKeyDown}
         ref={inputRef}
       />
@@ -116,7 +111,7 @@ export const Search = () => {
           onClick={onInputClick}
         />
       )}
-      <DeleteBtn isVisible={isFocused} onClick={onDeleteClick} />
+      {isFocused && <DeleteBtn onClick={onDeleteClick} />}
       <S.IconSearchCont onClick={() => onSearchClick(keyword)}>
         <IconSearch />
       </S.IconSearchCont>

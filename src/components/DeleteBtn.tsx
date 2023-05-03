@@ -4,13 +4,12 @@ import { IconX } from "../assets/icons/IconX";
 import { COLOR } from "../utils/constant";
 
 type Props = {
-  isVisible: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export const DeleteBtn = ({ isVisible, onClick }: Props) => {
+export const DeleteBtn = ({ onClick }: Props) => {
   return (
-    <S.IconXCont onClick={onClick} style={{ opacity: !isVisible ? "0" : "1" }}>
+    <S.IconXCont onClick={onClick}>
       <IconX />
     </S.IconXCont>
   );

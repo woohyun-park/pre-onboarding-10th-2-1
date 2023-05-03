@@ -1,16 +1,24 @@
-import { formatRecommendedKeywords } from "../utils/format";
+import {
+  formatRecentKeywords,
+  formatRecommendedKeywords,
+} from "../utils/format";
 
 export const readRecentKeywords = () => {
   const recentKeywords = localStorage.getItem("recentKeywords");
   if (recentKeywords) {
-    return JSON.parse(recentKeywords);
+    return formatRecentKeywords(JSON.parse(recentKeywords));
   } else {
     return [];
   }
 };
 
-export const updateRecentKeywords = (keywords: string[]) => {
-  return localStorage.setItem("recentKeywords", JSON.stringify(keywords));
+export const updateRecentKeywords = (keyword: string) => {
+  const newRecentKeywords = [
+    keyword,
+    ...JSON.parse(localStorage.getItem("recentKeywords") || ""),
+  ];
+  console.log(newRecentKeywords);
+  localStorage.setItem("recentKeywords", JSON.stringify(newRecentKeywords));
 };
 
 export const readCachedKeywords = (keyword: string) => {

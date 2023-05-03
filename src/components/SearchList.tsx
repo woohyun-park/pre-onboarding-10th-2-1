@@ -12,6 +12,7 @@ export const SearchList = () => {
     selected,
     isSearching,
     setRecommendedKeywords,
+    setSelected,
   } = useContext(GlobalContext);
 
   useEffect(() => {
@@ -35,9 +36,13 @@ export const SearchList = () => {
           )}
           {recommendedKeywords.map((e, i) =>
             selected === i + 1 ? (
-              <SearchEach value={e} selected />
+              <SearchEach
+                value={e}
+                selected
+                onMouseEnter={() => setSelected(i + 1)}
+              />
             ) : (
-              <SearchEach value={e} />
+              <SearchEach value={e} onMouseEnter={() => setSelected(i + 1)} />
             )
           )}
         </>
