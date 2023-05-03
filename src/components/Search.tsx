@@ -1,12 +1,13 @@
-import React, { useContext, useRef } from "react";
+import React, { useContext, useRef, useState } from "react";
 import styled from "styled-components";
 import { fetchSearch } from "../apis/api";
+import { readCachedKeywords, readRecentKeywords } from "../apis/local";
 import { GlobalContext } from "../App";
 import { IconSearch } from "../assets/icons/IconSearch";
-import { IconX } from "../assets/icons/IconX";
 import useDebounce from "../hooks/useDebounce";
-import { ISearch } from "../types/types";
 import { COLOR } from "../utils/constant";
+import { formatRecommendedKeywords } from "../utils/format";
+import { wrapPromise } from "../utils/promise";
 import { DeleteBtn } from "./DeleteBtn";
 import { PlaceHolder } from "./PlaceHolder";
 
@@ -21,6 +22,7 @@ export const Search = () => {
     setRecommendedKeywords,
     setSelected,
     setIsFocused,
+    setIsSearching,
   } = useContext(GlobalContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -28,29 +30,25 @@ export const Search = () => {
     value: keyword,
     action: async () => {
       if (keyword !== "") {
-        const res = await fetchSearch(keyword);
-        console.log(res.data);
-        const newRecommendedKeywords = res.data
-          .map((e: ISearch) => e.name)
-          .slice(0, 7);
-        setRecommendedKeywords(newRecommendedKeywords);
+        if (!readCachedKeywords(keyword)) {
+          await wrapPromise(() => setIsSearching(true), 0);
+          const res = await fetchSearch(keyword);
+          await wrapPromise(() => setIsSearching(false), 0);
+          setRecommendedKeywords(formatRecommendedKeywords(res.data));
+        }
       } else {
-        setRecommendedKeywords([]);
+        setRecommendedKeywords(readRecentKeywords);
       }
     },
-    delay: 1000,
+    delay: 5000,
   });
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newKeyword = e.target.value;
     setKeyword(newKeyword);
-    const cachedRecommendedKeywords = localStorage.getItem(newKeyword);
-    if (cachedRecommendedKeywords) {
-      setRecommendedKeywords(
-        JSON.parse(cachedRecommendedKeywords)
-          .data.map((e: ISearch) => e.name)
-          .slice(0, 7)
-      );
+    const cachedKeywords = readCachedKeywords(newKeyword);
+    if (cachedKeywords) {
+      setRecommendedKeywords(cachedKeywords);
     }
   };
 
@@ -60,6 +58,7 @@ export const Search = () => {
 
   const onBlur = () => {
     setIsFocused(false);
+    setSelected(0);
   };
 
   const onInputClick = () => {
@@ -96,41 +95,28 @@ export const Search = () => {
     } else if (key === "ArrowUp") {
       setSelected(selected - 1 < 1 ? recommendedKeywords.length : selected - 1);
     } else if (key === "Enter") {
-      // onSearchClick(recommendedKeywords);
+      onSearchClick(recommendedKeywords[selected - 1]);
     }
     console.log(e.key);
   };
 
   return (
     <S.Cont>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <S.Input
-          value={keyword}
-          onChange={onChange}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          onKeyDown={onKeyDown}
-          ref={inputRef}
-        />
-        {/* <input type="reset" value="X" onClick={onDeleteClick} /> */}
-        {/* 
-        {isFocused && (
-          // <input type="reset" value="X" onClick={onDeleteClick} />
-          <DeleteBtn onClick={onDeleteClick} isFocused={isFocused} />
-          // <S.IconXCont onClick={onXClick}>
-          //   <IconX />
-          // </S.IconXCont>
-        )} */}
-      </form>
-      <DeleteBtn isFocused={isFocused} onClick={onDeleteClick} />
-
+      <S.Input
+        value={keyword}
+        onChange={onChange}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        onKeyDown={onKeyDown}
+        ref={inputRef}
+      />
       {keyword === "" && !isFocused && (
         <PlaceHolder
           placeHolder="질환명을 입력해 주세요"
           onClick={onInputClick}
         />
       )}
-
+      <DeleteBtn isVisible={isFocused} onClick={onDeleteClick} />
       <S.IconSearchCont onClick={() => onSearchClick(keyword)}>
         <IconSearch />
       </S.IconSearchCont>

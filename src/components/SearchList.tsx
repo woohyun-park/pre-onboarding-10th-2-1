@@ -1,29 +1,46 @@
 import { useContext, useEffect } from "react";
 import styled from "styled-components";
+import { readRecentKeywords } from "../apis/local";
 import { GlobalContext } from "../App";
 import { COLOR } from "../utils/constant";
 import { SearchEach } from "./SearchEach";
 
 export const SearchList = () => {
-  const { keyword, recommendedKeywords, selected, setRecommendedKeywords } =
-    useContext(GlobalContext);
+  const {
+    keyword,
+    recommendedKeywords,
+    selected,
+    isSearching,
+    setRecommendedKeywords,
+  } = useContext(GlobalContext);
 
   useEffect(() => {
     if (keyword === "") {
-      const recentKeywords = localStorage.getItem("recentKeywords");
-      recentKeywords && setRecommendedKeywords(JSON.parse(recentKeywords));
+      const recentKeywords = readRecentKeywords();
+      recentKeywords && setRecommendedKeywords(recentKeywords);
     }
   }, [keyword]);
 
   return (
     <S.Cont>
-      <S.Group>{keyword === "" ? "최근 검색어" : "추천 검색어"}</S.Group>
-      {recommendedKeywords.map((e, i) =>
-        selected === i + 1 ? (
-          <SearchEach value={e} selected />
-        ) : (
-          <SearchEach value={e} />
-        )
+      {isSearching ? (
+        <S.Group>검색 중 ...</S.Group>
+      ) : (
+        <>
+          <S.Group>{keyword === "" ? "최근 검색어" : "추천 검색어"}</S.Group>
+          {recommendedKeywords.length === 0 && (
+            <S.Message>
+              {keyword === "" ? "최근" : "추천"} 검색어가 없습니다
+            </S.Message>
+          )}
+          {recommendedKeywords.map((e, i) =>
+            selected === i + 1 ? (
+              <SearchEach value={e} selected />
+            ) : (
+              <SearchEach value={e} />
+            )
+          )}
+        </>
       )}
     </S.Cont>
   );
@@ -44,5 +61,10 @@ const S = {
     font-size: 0.825rem;
     padding: 0 2rem;
     margin-bottom: 0.625rem;
+  `,
+  Message: styled.div`
+    color: ${COLOR.txt3};
+    font-size: 1rem;
+    padding: 0.625rem 2rem;
   `,
 };

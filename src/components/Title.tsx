@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import { DEVICE } from "../utils/constant";
 
 type Props = {
   value: string;

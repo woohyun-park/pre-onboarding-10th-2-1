@@ -1,28 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import styled from "styled-components";
 import { IconX } from "../assets/icons/IconX";
 import { COLOR } from "../utils/constant";
 
 type Props = {
-  isFocused: boolean;
+  isVisible: boolean;
   onClick: (e: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export const DeleteBtn = ({ isFocused, onClick }: Props) => {
-  //   const [show, setShow] = useState(isFocused);
-  //   useEffect(() => {
-  //     setTimeout(() => setShow(isFocused), 500);
-  //   }, [isFocused]);
-
+export const DeleteBtn = ({ isVisible, onClick }: Props) => {
   return (
-    <>
-      <S.IconXCont
-        onClick={onClick}
-        style={{ opacity: !isFocused ? "0" : "1" }}
-      >
-        <IconX />
-      </S.IconXCont>
-    </>
+    <S.IconXCont onClick={onClick} style={{ opacity: !isVisible ? "0" : "1" }}>
+      <IconX />
+    </S.IconXCont>
   );
 };
 

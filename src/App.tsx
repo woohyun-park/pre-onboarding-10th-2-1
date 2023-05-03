@@ -14,11 +14,13 @@ type IGlobalContext = {
   recommendedKeywords: string[];
   selected: number;
   isFocused: boolean;
+  isSearching: boolean;
 
   setKeyword: Function;
   setRecommendedKeywords: Function;
   setSelected: Function;
   setIsFocused: Function;
+  setIsSearching: Function;
 };
 
 export const GlobalContext = React.createContext<IGlobalContext>({
@@ -26,11 +28,13 @@ export const GlobalContext = React.createContext<IGlobalContext>({
   recommendedKeywords: [],
   selected: 0,
   isFocused: false,
+  isSearching: false,
 
   setKeyword: () => {},
   setRecommendedKeywords: () => {},
   setSelected: () => {},
   setIsFocused: () => {},
+  setIsSearching: () => {},
 });
 
 function App() {
@@ -38,6 +42,7 @@ function App() {
   const [recommendedKeywords, setRecommendedKeywords] = useState<string[]>([]);
   const [selected, setSelected] = useState(0);
   const [isFocused, setIsFocused] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
 
   return (
     <GlobalContext.Provider
@@ -46,10 +51,12 @@ function App() {
         recommendedKeywords,
         selected,
         isFocused,
+        isSearching,
         setKeyword,
         setRecommendedKeywords,
         setSelected,
         setIsFocused,
+        setIsSearching,
       }}
     >
       <S.ContWrap>

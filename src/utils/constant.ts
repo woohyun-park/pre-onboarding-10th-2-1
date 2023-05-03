@@ -7,7 +7,3 @@ export const COLOR = {
   white: "RGB(255, 255, 255)",
   primary: "RGB(1, 123, 232)",
 };
-
-export const DEVICE = {
-  laptop: "1024px",
-};
